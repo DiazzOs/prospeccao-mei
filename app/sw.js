@@ -1,5 +1,5 @@
 // Prospecção MEI — service worker. Ao mudar o app, aumente CACHE para os aparelhos receberem a atualização.
-const CACHE = 'prospeccao-mei-v1';
+const CACHE = 'prospeccao-mei-v2';
 const BASE = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 self.addEventListener('install', (e) => { e.waitUntil(caches.open(CACHE).then((c) => c.addAll(BASE)).then(() => self.skipWaiting())); });
 self.addEventListener('activate', (e) => {
