@@ -15,6 +15,7 @@ Uso (no terminal, dentro da pasta do projeto):
 Só usa a biblioteca padrão do Python 3.9+. Não precisa instalar nada.
 """
 import argparse
+import base64
 import csv
 import io
 import json
@@ -26,7 +27,8 @@ import urllib.request
 import zipfile
 from datetime import datetime
 
-BASE_URL = "https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/"
+SITE = "https://arquivos.receitafederal.gov.br"
+TOKEN_PADRAO = "YggdBLfdninEJX9"  # compartilhamento público (Nextcloud) dos dados abertos de CNPJ
 UA = {"User-Agent": "Mozilla/5.0 (prospeccao-mei)"}
 ARQUIVOS = (
     [f"Estabelecimentos{i}.zip" for i in range(10)]
@@ -42,48 +44,68 @@ def log(msg):
 
 # ---------------------------------------------------------------- download
 
-def _get(url, timeout=60):
-    return urllib.request.urlopen(urllib.request.Request(url, headers=UA), timeout=timeout)
+def descobrir_token():
+    """A Receita publica os dados num compartilhamento do Nextcloud; o código dele pode mudar."""
+    try:
+        html = urllib.request.urlopen(urllib.request.Request(SITE + "/", headers=UA), timeout=30).read().decode("utf-8", "replace")
+        m = re.search(r"/index\.php/s/([A-Za-z0-9]{8,})", html)
+        if m:
+            return m.group(1)
+    except Exception:  # noqa: BLE001
+        pass
+    return TOKEN_PADRAO
 
 
-def mes_mais_recente():
-    html = _get(BASE_URL).read().decode("utf-8", "replace")
-    meses = sorted(set(re.findall(r'href="(\d{4}-\d{2})/?"', html)))
+def _req(caminho, token, metodo="GET", timeout=120, headers=None):
+    auth = base64.b64encode(f"{token}:".encode()).decode()
+    h = {**UA, "Authorization": "Basic " + auth, **(headers or {})}
+    url = f"{SITE}/public.php/webdav/{caminho}"
+    return urllib.request.urlopen(urllib.request.Request(url, headers=h, method=metodo), timeout=timeout)
+
+
+def mes_mais_recente(token):
+    xml = _req("", token, "PROPFIND", 60, {"Depth": "1"}).read().decode("utf-8", "replace")
+    meses = sorted(set(re.findall(r"/(\d{4}-\d{2})/?<", xml)))
     if not meses:
-        raise RuntimeError("não encontrei pastas de mês na página da Receita")
+        raise RuntimeError("não encontrei pastas de mês no compartilhamento da Receita")
     return meses[-1]
 
 
-def baixar(pasta, mes):
+def baixar(pasta, mes, token):
     os.makedirs(pasta, exist_ok=True)
-    url_mes = f"{BASE_URL}{mes}/"
     for nome in ARQUIVOS:
         destino = os.path.join(pasta, nome)
-        url = url_mes + nome
-        try:
-            resp = _get(url, timeout=120)
-        except Exception as e:  # noqa: BLE001
-            raise RuntimeError(f"falha ao baixar {url}: {e}")
-        total = int(resp.headers.get("Content-Length") or 0)
-        if os.path.exists(destino) and total and os.path.getsize(destino) == total:
-            log(f"{nome}: já baixado")
-            resp.close()
-            continue
-        log(f"baixando {nome} ({total / 1e6:.0f} MB)...")
-        parcial = destino + ".parcial"
-        feito, ultimo = 0, time.time()
-        with open(parcial, "wb") as f:
-            while True:
-                bloco = resp.read(1 << 20)
-                if not bloco:
+        for tentativa in range(1, 4):
+            try:
+                resp = _req(f"{mes}/{nome}", token, timeout=180)
+                total = int(resp.headers.get("Content-Length") or 0)
+                if os.path.exists(destino) and total and os.path.getsize(destino) == total:
+                    log(f"{nome}: já baixado")
+                    resp.close()
                     break
-                f.write(bloco)
-                feito += len(bloco)
-                if time.time() - ultimo > 5 and total:
-                    log(f"  {nome}: {100 * feito / total:.0f}%")
-                    ultimo = time.time()
-        resp.close()
-        os.replace(parcial, destino)
+                log(f"baixando {nome} ({total / 1e6:.0f} MB)...")
+                parcial = destino + ".parcial"
+                feito, ultimo = 0, time.time()
+                with open(parcial, "wb") as f:
+                    while True:
+                        bloco = resp.read(1 << 20)
+                        if not bloco:
+                            break
+                        f.write(bloco)
+                        feito += len(bloco)
+                        if time.time() - ultimo > 15 and total:
+                            log(f"  {nome}: {100 * feito / total:.0f}%")
+                            ultimo = time.time()
+                resp.close()
+                if total and feito != total:
+                    raise IOError(f"veio {feito} de {total} bytes")
+                os.replace(parcial, destino)
+                break
+            except Exception as e:  # noqa: BLE001
+                if tentativa == 3:
+                    raise RuntimeError(f"falha ao baixar {nome}: {e}")
+                log(f"  erro em {nome} ({e}); tentando de novo...")
+                time.sleep(10 * tentativa)
     with open(os.path.join(pasta, "MES.txt"), "w") as f:
         f.write(mes)
 
@@ -164,13 +186,14 @@ def main():
     mes = a.mes
     if not a.sem_baixar:
         try:
-            mes = mes or mes_mais_recente()
+            token = descobrir_token()
+            mes = mes or mes_mais_recente(token)
             log(f"base da Receita: {mes}")
-            baixar(a.pasta, mes)
+            baixar(a.pasta, mes, token)
         except Exception as e:  # noqa: BLE001
             sys.exit(
                 f"\nNão consegui baixar automaticamente: {e}\n"
-                f"Baixe manualmente em {BASE_URL} (pasta do mês mais recente) os arquivos:\n  "
+                f"Baixe manualmente em {SITE}/index.php/s/{TOKEN_PADRAO} (pasta do mês mais recente) os arquivos:\n  "
                 + ", ".join(ARQUIVOS)
                 + f"\ncoloque-os em ./{a.pasta}/ e rode de novo com --sem-baixar --mes AAAA-MM"
             )

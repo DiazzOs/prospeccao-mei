@@ -33,7 +33,7 @@ python preparar_dados.py --uf MA
 - Para mais estados, use `--uf MA PI`. A cidade você escolhe depois, no próprio app, entre todas as cidades desses estados.
 - O script baixa os arquivos do mês mais recente para a pasta `receita/`. Na primeira vez demora, porque é bastante coisa. Se você rodar de novo, ele não baixa de novo o que já está completo.
 - Se o download automático falhar (a Receita às vezes muda o endereço), baixe os arquivos à mão em
-  https://arquivos.receitafederal.gov.br/dados/cnpj/dados_abertos_cnpj/ , que são `Estabelecimentos0-9.zip`, `Empresas0-9.zip`, `Simples.zip`, `Municipios.zip` e `Cnaes.zip`. Coloque tudo em `receita/` e rode:
+  https://arquivos.receitafederal.gov.br/index.php/s/YggdBLfdninEJX9 (pasta do mês mais recente), que são `Estabelecimentos0-9.zip`, `Empresas0-9.zip`, `Simples.zip`, `Municipios.zip` e `Cnaes.zip`. Coloque tudo em `receita/` e rode:
   ```bash
   python preparar_dados.py --uf MA --sem-baixar --mes 2026-11
   ```
