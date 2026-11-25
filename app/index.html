@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0F766E">
+<title>Prospecção MEI</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@600;700&display=swap">
+<style>
+:root{
+  --verde:#0F766E;--verde-esc:#115E59;--verde-claro:#E8F5F3;--verde-txt:#0F5F58;
+  --zap:#15803D;--tinta:#14181F;--cinza:#4A5260;--cinza2:#5B6370;--borda:#D5D9E0;--borda2:#E3E6EB;--linha:#EEF0F3;--fundo:#F5F6F8;
+  --azul:#1D4ED8;--azul-bg:#E6EEFC;--ok:#166534;--ok-bg:#E3F4E8;--nao:#B91C1C;--nao-bg:#FBE9E9;--novo:#3D4450;--novo-bg:#EEF0F3;
+  --tit:'Space Grotesk',system-ui,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--tinta);background:var(--fundo);-webkit-tap-highlight-color:transparent}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--verde)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+svg{flex:none}
+.oculto{display:none!important}
+
+/* ---------- comuns ---------- */
+.btn{height:48px;border-radius:12px;border:1px solid var(--borda);background:#fff;font-weight:600;font-size:15px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;text-decoration:none;color:var(--tinta)}
+.btn.pri{background:var(--verde);border-color:var(--verde);color:#fff}
+.btn.zap{background:var(--zap);border-color:var(--zap);color:#fff}
+.btn[disabled],.btn.desat{opacity:.45;pointer-events:none}
+.chip{height:40px;padding:0 14px;border-radius:20px;border:1px solid var(--borda);background:#fff;font-size:14px;font-weight:600}
+.chip.on{background:var(--verde);border-color:var(--verde);color:#fff}
+.campo{height:48px;border:1px solid var(--borda);border-radius:10px;padding:0 12px;font-size:16px;background:#fff;width:100%}
+.campo:focus,.busca input:focus{outline:2px solid var(--verde);outline-offset:-1px;border-color:var(--verde)}
+.rot{font-size:13px;font-weight:600;color:var(--cinza)}
+.sec{font-size:13px;font-weight:700;color:var(--cinza);text-transform:uppercase;letter-spacing:.04em}
+.busca{position:relative}
+.busca input{width:100%;height:46px;border:1px solid var(--borda);border-radius:12px;padding:0 12px 0 40px;font-size:15px;background:var(--fundo)}
+.busca svg{position:absolute;left:12px;top:13px}
+.pill{flex:none;height:24px;padding:0 8px;border-radius:12px;font-size:12px;font-weight:600;display:inline-flex;align-items:center}
+.s-novo{background:var(--novo-bg);color:var(--novo)}
+.s-contatado{background:var(--azul-bg);color:var(--azul)}
+.s-interessado{background:var(--ok-bg);color:var(--ok)}
+.s-naoquer{background:var(--nao-bg);color:var(--nao)}
+.toggle{display:flex;align-items:center;justify-content:space-between;min-height:44px;font-size:15px;gap:12px}
+.toggle input{width:22px;height:22px;accent-color:var(--verde)}
+.aviso{background:#FFF7E6;border:1px solid #F3D9A4;color:#7A4B00;border-radius:12px;padding:10px 12px;font-size:13px;line-height:1.45}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--tinta);color:#fff;padding:12px 16px;border-radius:12px;font-size:14px;z-index:99;max-width:90vw;box-shadow:0 6px 24px rgba(0,0,0,.2)}
+
+/* ---------- tela cidade ---------- */
+#v-cidade{min-height:100%;display:flex;flex-direction:column;max-width:560px;margin:0 auto}
+.topo-cid{background:var(--verde);color:#fff;padding:40px 24px 72px;display:flex;flex-direction:column;gap:8px}
+.marca{display:flex;align-items:center;gap:10px;font-family:var(--tit);font-weight:700;font-size:20px}
+.marca .ic{width:36px;height:36px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center}
+.topo-cid h1{margin:16px 0 0;font-family:var(--tit);font-size:28px;line-height:1.15}
+.topo-cid p{margin:0;font-size:15px;line-height:1.45;color:#D7F2EE}
+.cartao-cid{margin:-44px 16px 0;background:#fff;border-radius:16px;padding:20px;box-shadow:0 6px 24px rgba(20,24,31,.08);display:flex;flex-direction:column;gap:16px}
+.sug{border:1px solid var(--borda2);border-radius:10px;overflow:hidden;display:flex;flex-direction:column;max-height:264px;overflow-y:auto}
+.sug button{min-height:48px;border:0;border-top:1px solid var(--linha);background:#fff;text-align:left;padding:0 14px;font-size:15px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.sug button:first-child{border-top:0}
+.sug button.sel{background:var(--verde-claro)}
+.sug small{color:var(--cinza2);font-size:12px}
+.rodape-cid{margin:auto 24px 24px;padding-top:24px;font-size:12px;line-height:1.5;color:var(--cinza2);text-align:center}
+
+/* ---------- lista ---------- */
+#app-principal{height:100%;display:flex;flex-direction:column}
+.cab{background:#fff;padding:12px 16px 0;display:flex;flex-direction:column;gap:12px;border-bottom:1px solid var(--borda2)}
+.cab-l1{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cidade-btn{border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:2px;min-height:44px}
+.cidade-btn small{font-size:12px;font-weight:600;color:var(--cinza2);text-transform:uppercase;letter-spacing:.04em}
+.cidade-btn span{font-family:var(--tit);font-size:22px;font-weight:700;display:flex;align-items:center;gap:6px}
+.ico-btn{width:44px;height:44px;border-radius:12px;border:1px solid var(--borda);background:#fff;display:flex;align-items:center;justify-content:center;position:relative}
+.badge{position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;border-radius:9px;background:var(--verde);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;padding:0 4px}
+.chips-ativos{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.chips-ativos:empty{display:none}
+.chip-at{flex:none;height:30px;padding:0 10px;border-radius:15px;background:var(--verde-claro);color:var(--verde-txt);font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px;border:0}
+.abas{display:flex;gap:4px;margin:0 -16px;padding:0 12px;overflow-x:auto;scrollbar-width:none}
+.aba{flex:none;height:44px;padding:0 12px;border:0;background:transparent;font-size:14px;font-weight:600;color:var(--cinza2);border-bottom:3px solid transparent}
+.aba.on{color:var(--verde);border-bottom-color:var(--verde)}
+.aba em{font-style:normal;font-weight:500;opacity:.8}
+.corpo{flex:1;display:flex;min-height:0}
+#v-lista{flex:1;overflow-y:auto;padding:12px 16px 24px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.info-lista{font-size:13px;color:var(--cinza2)}
+.card{background:#fff;border-radius:14px;border:1px solid var(--borda2);padding:14px;display:flex;flex-direction:column;gap:10px}
+.card.atual{border-color:var(--verde);box-shadow:0 0 0 1px var(--verde)}
+.card-topo{border:0;background:none;padding:0;text-align:left;display:flex;flex-direction:column;gap:4px;width:100%}
+.card-l1{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;width:100%}
+.card-nome{font-size:16px;font-weight:700;line-height:1.25}
+.card-dono{font-size:13px;color:var(--cinza2)}
+.card-ativ{font-size:14px}
+.card-meta{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:13px;color:var(--cinza);margin-top:2px}
+.card-meta span{display:flex;align-items:center;gap:4px}
+.card-meta b{color:var(--tinta);font-weight:600}
+.card-acoes{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.card-acoes .btn{height:44px;font-size:14px;border-radius:10px}
+.vazio{text-align:center;color:var(--cinza2);padding:48px 16px;font-size:15px;line-height:1.5}
+.cards{display:flex;flex-direction:column;gap:12px}
+.tabela{display:none}
+
+/* ---------- detalhe ---------- */
+#v-detalhe{display:none;flex-direction:column;background:var(--fundo);min-height:0}
+.det-cab{background:#fff;padding:8px 8px 16px;border-bottom:1px solid var(--borda2);display:flex;flex-direction:column;gap:6px}
+.voltar{align-self:flex-start;height:44px;padding:0 8px;display:flex;align-items:center;gap:4px;border:0;background:none;font-size:15px;font-weight:600;color:var(--verde)}
+.det-tit{padding:0 12px;display:flex;flex-direction:column;gap:4px}
+.det-tit h2{margin:0;font-family:var(--tit);font-size:24px;line-height:1.2}
+.det-tit span{font-size:14px;color:var(--cinza2)}
+.det-acoes{padding:8px 12px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.det-acoes .btn{height:56px;flex-direction:column;gap:3px;font-size:13px}
+.det-corpo{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:14px}
+.bloco{background:#fff;border:1px solid var(--borda2);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.status-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.st{height:44px;border-radius:10px;font-size:14px;font-weight:600;border:2px solid var(--borda2);background:#fff;color:var(--cinza)}
+.st.on.s-novo{border-color:var(--novo);background:var(--novo-bg);color:var(--novo)} .st.on.s-contatado{border-color:var(--azul);background:var(--azul-bg);color:var(--azul)} .st.on.s-interessado{border-color:var(--ok);background:var(--ok-bg);color:var(--ok)} .st.on.s-naoquer{border-color:var(--nao);background:var(--nao-bg);color:var(--nao)}
+.notas-rap{display:flex;flex-wrap:wrap;gap:8px}
+.notas-rap button{height:36px;padding:0 12px;border-radius:18px;border:1px solid var(--borda);background:#fff;font-size:13px}
+textarea{border:1px solid var(--borda);border-radius:10px;padding:10px 12px;font-size:15px;resize:vertical;min-height:64px}
+.dados{padding:4px 14px;gap:0}
+.dado{display:flex;flex-direction:column;gap:2px;padding:10px 0;border-bottom:1px solid var(--linha)}
+.dado:last-child{border-bottom:0}
+.dado small{font-size:12px;font-weight:600;color:var(--cinza2)}
+.dado span{font-size:15px;line-height:1.35;word-break:break-word}
+.hist{display:flex;gap:10px;font-size:14px}
+.hist span:first-child{color:var(--cinza2);flex:none;width:92px}
+
+/* ---------- filtros (folha) ---------- */
+#folha{position:fixed;inset:0;background:rgba(20,24,31,.45);display:flex;flex-direction:column;justify-content:flex-end;z-index:20}
+.folha{background:#fff;border-radius:20px 20px 0 0;max-height:92vh;display:flex;flex-direction:column;width:100%;max-width:560px;margin:0 auto}
+.folha-cab{padding:8px 12px 12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--borda2)}
+.folha-cab h2{margin:0;font-family:var(--tit);font-size:20px}
+.folha-corpo{overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:22px}
+.folha-rod{padding:12px 20px calc(20px + env(safe-area-inset-bottom));border-top:1px solid var(--borda2);display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grupo{display:flex;flex-direction:column;gap:10px}
+.grupo>b{font-size:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.puxador{padding:10px 0 0;display:flex;justify-content:center}
+.puxador span{width:40px;height:4px;border-radius:2px;background:var(--borda)}
+#filtros-lado{display:none}
+
+/* ---------- configurações ---------- */
+.cfg-lista{display:flex;flex-direction:column;gap:10px}
+
+/* ---------- PC ---------- */
+@media (min-width:1024px){
+  .cab{flex-direction:row;flex-wrap:wrap;align-items:center;padding:12px 24px;gap:16px}
+  .cab-l1{gap:16px}
+  .cab .busca{flex:1 1 320px;max-width:560px}
+  .cab #btn-filtros{display:none}
+  .chips-ativos{display:none}
+  .abas{order:9;flex-basis:100%;margin:0 -12px}
+  .corpo{padding:20px 24px;gap:20px;align-items:flex-start;overflow:hidden}
+  #filtros-lado{display:flex;flex:0 0 250px;background:#fff;border:1px solid var(--borda2);border-radius:14px;padding:16px;flex-direction:column;gap:18px;max-height:100%;overflow-y:auto}
+  #filtros-lado .chip{height:34px;font-size:13px;padding:0 12px}
+  #v-lista{background:#fff;border:1px solid var(--borda2);border-radius:14px;padding:0;gap:0;max-height:100%}
+  #v-lista .cards{display:none}
+  #v-lista .info-lista{padding:12px 16px}
+  .tabela{display:table;width:100%;border-collapse:collapse;font-size:14px}
+  .tabela th{position:sticky;top:0;background:#fff;text-align:left;color:var(--cinza2);font-size:12px;text-transform:uppercase;letter-spacing:.04em;padding:10px 16px;border-bottom:1px solid var(--borda2)}
+  .tabela td{padding:10px 16px;border-top:1px solid var(--linha);vertical-align:top}
+  .tabela tr.lin{cursor:pointer}
+  .tabela tr.lin:hover{background:#F9FAFB}
+  .tabela tr.lin.atual{background:var(--verde-claro)}
+  .tabela td small{display:block;font-size:12px;color:var(--cinza2)}
+  #v-detalhe{display:flex!important;flex:0 0 380px;background:#fff;border:1px solid var(--borda2);border-radius:14px;max-height:100%;overflow:hidden}
+  #v-detalhe .voltar{display:none}
+  #v-detalhe .det-cab{border-radius:14px 14px 0 0}
+  #v-detalhe .det-corpo{background:#fff;padding:12px 16px}
+  #v-detalhe .bloco{border:0;padding:0}
+  .mais-wrap{padding:12px 16px}
+}
+@media (max-width:1023px){
+  body.ver-detalhe #v-lista{display:none}
+  body.ver-detalhe #v-detalhe{display:flex;flex:1}
+  body.ver-detalhe .cab{display:none}
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== ESCOLHER CIDADE ===================== -->
+<div id="v-cidade" class="oculto">
+  <div class="topo-cid">
+    <div class="marca"><span class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 21h18"/><path d="M5 21V8l7-5 7 5v13"/><path d="M9 21v-6h6v6"/></svg></span>Prospecção MEI</div>
+    <h1>Encontre MEIs da sua região</h1>
+    <p>Escolha a cidade e veja os microempreendedores ativos para oferecer crédito.</p>
+  </div>
+  <div class="cartao-cid">
+    <div id="aviso-dados" class="aviso oculto"></div>
+    <div class="grupo">
+      <label for="sel-uf" class="rot">Estado</label>
+      <select id="sel-uf" class="campo"></select>
+    </div>
+    <div class="grupo">
+      <label for="in-cidade" class="rot">Cidade</label>
+      <div class="busca"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4A5260" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input id="in-cidade" autocomplete="off" placeholder="Digite o nome da cidade" style="background:#fff;height:48px;font-size:16px;border-radius:10px"></div>
+      <div id="sug" class="sug" role="listbox" aria-label="Cidades"></div>
+    </div>
+    <div class="grupo">
+      <span class="rot">Mostrar</span>
+      <div class="toggle"><span>Somente MEIs ativos</span><input type="checkbox" checked disabled aria-label="Somente MEIs ativos (sempre)"></div>
+      <label class="toggle"><span>Somente com telefone</span><input type="checkbox" id="cid-tel"></label>
+    </div>
+    <button id="btn-ver" class="btn pri" disabled>Escolha uma cidade</button>
+    <label class="btn" style="font-size:14px;height:44px">Abrir arquivo de cidade (.json)<input type="file" id="in-arquivo" accept=".json,application/json" class="sr"></label>
+  </div>
+  <div id="recentes-wrap" class="grupo oculto" style="margin:20px 16px 0">
+    <span class="rot">Cidades usadas recentemente</span>
+    <div id="recentes" class="chips"></div>
+  </div>
+  <p class="rodape-cid" id="rodape-cid">Dados públicos de CNPJ da Receita Federal.<br>Seus contatos e anotações ficam só neste aparelho.</p>
+</div>
+
+<!-- ===================== PRINCIPAL ===================== -->
+<div id="app-principal" class="oculto">
+  <div class="cab">
+    <div class="cab-l1">
+      <button class="cidade-btn" id="btn-cidade"><small>Prospectando em</small><span><b id="nome-cidade" style="font-weight:700"></b><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span></button>
+      <div style="display:flex;gap:8px">
+        <button class="ico-btn" id="btn-cfg" aria-label="Configurações"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14181F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+        <button class="ico-btn" id="btn-filtros" aria-label="Filtros"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14181F" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16"/><path d="M7 12h10"/><path d="M10 18h4"/></svg><span class="badge oculto" id="badge"></span></button>
+      </div>
+    </div>
+    <div class="busca"><label for="in-busca" class="sr">Buscar</label><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5B6370" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+      <input id="in-busca" type="search" placeholder="Buscar por nome, atividade, rua ou bairro" autocomplete="off"></div>
+    <div class="chips-ativos" id="chips-ativos"></div>
+    <div class="abas" role="tablist" id="abas"></div>
+  </div>
+  <div class="corpo">
+    <aside id="filtros-lado" aria-label="Filtros"></aside>
+    <div id="v-lista"></div>
+    <section id="v-detalhe" aria-live="polite"></section>
+  </div>
+</div>
+
+<div id="folha" class="oculto"></div>
+
+<script>
+'use strict';
+/* =============================================================
+   Prospecção MEI — app de uma página, sem servidor.
+   Dados da cidade: dados/<UF>/<codigo>.json (gerados por preparar_dados.py)
+   Contatos/anotações: localStorage (só no aparelho)
+   ============================================================= */
+
+const $ = (s) => document.querySelector(s);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const semAcento = (s) => String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const titulo = (s) => String(s || '').toLowerCase().replace(/(^|[\s/(.-])([a-zà-ú])/g, (m, a, b) => a + b.toUpperCase()).replace(/\b(De|Da|Do|Das|Dos|E)\b/g, (m) => m.toLowerCase());
+
+const LS = {
+  get(k, d) { try { const v = localStorage.getItem('pm:' + k); return v == null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem('pm:' + k, JSON.stringify(v)); } catch { toast('Não consegui salvar neste aparelho.'); } },
+};
+
+/* ---------- IndexedDB (dados das cidades, que podem ser grandes) ---------- */
+const IDB = {
+  db: null,
+  abrir() {
+    if (this.db) return Promise.resolve(this.db);
+    return new Promise((ok, erro) => {
+      if (!('indexedDB' in window)) return erro(new Error('sem indexedDB'));
+      const r = indexedDB.open('prospeccao-mei', 1);
+      r.onupgradeneeded = () => r.result.createObjectStore('cidades');
+      r.onsuccess = () => { this.db = r.result; ok(this.db); };
+      r.onerror = () => erro(r.error);
+    });
+  },
+  async get(k) { try { const db = await this.abrir(); return await new Promise((ok) => { const r = db.transaction('cidades').objectStore('cidades').get(k); r.onsuccess = () => ok(r.result); r.onerror = () => ok(undefined); }); } catch { return undefined; } },
+  async set(k, v) { try { const db = await this.abrir(); await new Promise((ok) => { const t = db.transaction('cidades', 'readwrite'); t.objectStore('cidades').put(v, k); t.oncomplete = ok; t.onerror = ok; }); } catch { /* sem cache: segue só em memória */ } },
+};
+
+/* ---------- ícones ---------- */
+const IC = {
+  zap: (c = '#fff', s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l1.3-3.9A8 8 0 1 1 8 19z"/></svg>`,
+  tel: (c = '#14181F', s = 18) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2z"/></svg>`,
+  pin: (c = '#4A5260', s = 14) => `<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="${c}" stroke-width="2" aria-hidden="true"><path d="M12 21s-7-6.2-7-11a7 7 0 0 1 14 0c0 4.8-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>`,
+  cal: `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4A5260" stroke-width="2" stroke-linecap="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>`,
+  x: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#14181F" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>`,
+  voltar: `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0F766E" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>`,
+};
+
+/* ---------- regras de negócio ---------- */
+const STATUS = [
+  { id: '', nome: 'Novo', cls: 's-novo' },
+  { id: 'contatado', nome: 'Contatado', cls: 's-contatado' },
+  { id: 'interessado', nome: 'Interessado', cls: 's-interessado' },
+  { id: 'naoquer', nome: 'Não quer', cls: 's-naoquer' },
+];
+const ABAS = [
+  { id: 'novos', nome: 'Novos', st: '' },
+  { id: 'contatados', nome: 'Contatados', st: 'contatado' },
+  { id: 'interessados', nome: 'Interessados', st: 'interessado' },
+  { id: 'naoquer', nome: 'Não quer', st: 'naoquer' },
+  { id: 'todos', nome: 'Todos', st: null },
+];
+const TIPOS = ['Comércio', 'Alimentação', 'Beleza', 'Oficina e mecânica', 'Construção', 'Fabricação', 'Outros serviços'];
+const TEMPOS = [{ id: 'qualquer', nome: 'Qualquer', m: 0 }, { id: '6m', nome: '+6 meses', m: 6 }, { id: '1a', nome: '+1 ano', m: 12 }, { id: '3a', nome: '+3 anos', m: 36 }];
+const ORDENS = [{ id: 'antigos', nome: 'Mais antigos primeiro' }, { id: 'novos', nome: 'Mais novos primeiro' }, { id: 'nome', nome: 'Nome (A–Z)' }, { id: 'bairro', nome: 'Bairro' }];
+const NOTAS_RAP = ['Não atendeu', 'Voltar depois', 'Número errado', 'Visitar pessoalmente'];
+const MSG_PADRAO = 'Olá{, nome}! Tudo bem? Trabalho com crédito para MEI aqui em {cidade} e tenho uma condição de empréstimo para o seu negócio{, empresa}. Posso te explicar rapidinho?';
+
+function tipoDoCnae(c) {
+  const p2 = c.slice(0, 2), p4 = c.slice(0, 4);
+  if (['10', '11', '56'].includes(p2) || ['4721', '4722', '4723', '4724', '4729'].includes(p4)) return 'Alimentação';
+  if (p4 === '9602') return 'Beleza';
+  if (['4520', '4543', '3314', '9511', '9512', '9521', '9529'].includes(p4)) return 'Oficina e mecânica';
+  if (['41', '42', '43'].includes(p2) || p4 === '4744') return 'Construção';
+  if (['45', '46', '47'].includes(p2)) return 'Comércio';
+  const n = +p2; if (n >= 12 && n <= 33) return 'Fabricação';
+  return 'Outros serviços';
+}
+function mesesDesde(aaaammdd) {
+  if (!aaaammdd) return -1;
+  const a = +aaaammdd.slice(0, 4), m = +aaaammdd.slice(4, 6), d = +aaaammdd.slice(6, 8), h = new Date();
+  return (h.getFullYear() - a) * 12 + (h.getMonth() + 1 - m) - (h.getDate() < d ? 1 : 0);
+}
+function tempoTxt(m) {
+  if (m < 0) return 'Data de abertura desconhecida';
+  if (m < 1) return 'Aberto há menos de 1 mês';
+  if (m < 12) return `Aberto há ${m} ${m === 1 ? 'mês' : 'meses'}`;
+  const a = Math.floor(m / 12); return `Aberto há ${a} ${a === 1 ? 'ano' : 'anos'}`;
+}
+const dataBR = (s) => s ? `${s.slice(6, 8)}/${s.slice(4, 6)}/${s.slice(0, 4)}` : '—';
+function fmtTel(t) {
+  if (!t) return '';
+  const d = t.slice(0, 2), n = t.slice(2);
+  return n.length === 9 ? `(${d}) ${n.slice(0, 5)}-${n.slice(5)}` : n.length === 8 ? `(${d}) ${n.slice(0, 4)}-${n.slice(4)}` : `(${d}) ${n}`;
+}
+/** devolve o número de celular (com DDD) bom para WhatsApp, ou '' */
+function celular(t) {
+  if (!t || t.length < 10) return '';
+  const d = t.slice(0, 2); let n = t.slice(2);
+  if (n.length === 8 && /^[6-9]/.test(n)) n = '9' + n; // celular antigo sem o 9
+  return n.length === 9 && n[0] === '9' ? d + n : '';
+}
+const fmtCnpj = (c) => c.length === 14 ? `${c.slice(0, 2)}.${c.slice(2, 5)}.${c.slice(5, 8)}/${c.slice(8, 12)}-${c.slice(12)}` : c;
+
+/* ---------- estado ---------- */
+const E = {
+  indice: null, cnaes: {}, cidade: null, linhas: [], bairros: [],
+  contatos: LS.get('contatos', {}),
+  filtros: Object.assign({ tempo: 'qualquer', tipos: [], bairros: [], tel: false, esconderNao: true, ordem: 'antigos' }, LS.get('filtros', {})),
+  aba: 'novos', busca: '', limite: 60, sel: null,
+  ufSel: null, cidSel: null,
+};
+const largo = matchMedia('(min-width:1024px)');
+
+function contato(cnpj) { return E.contatos[cnpj] || { s: '', n: '', h: [] }; }
+function salvarContato(cnpj, mud, hist) {
+  const c = Object.assign({ s: '', n: '', h: [] }, E.contatos[cnpj], mud);
+  if (hist) c.h = [[Date.now(), hist], ...(c.h || [])].slice(0, 40);
+  E.contatos[cnpj] = c; LS.set('contatos', E.contatos);
+}
+
+/* ---------- carregar dados ---------- */
+async function pegarJSON(url) {
+  const r = await fetch(url, { cache: 'no-cache' });
+  if (!r.ok) throw new Error(r.status + ' ' + url);
+  return r.json();
+}
+async function carregarIndice() {
+  try { E.indice = await pegarJSON('dados/indice.json'); LS.set('indice', E.indice); }
+  catch { E.indice = LS.get('indice', null); }
+  try { E.cnaes = await pegarJSON('dados/cnaes.json'); LS.set('cnaes', E.cnaes); }
+  catch { E.cnaes = LS.get('cnaes', {}); }
+}
+async function carregarCidade(uf, cod) {
+  const chave = uf + '/' + cod;
+  let d = null;
+  try { d = await pegarJSON(`dados/${uf}/${cod}.json`); IDB.set(chave, d); }
+  catch { d = await IDB.get(chave); }
+  if (!d) throw new Error('Não consegui carregar os dados dessa cidade. Verifique a internet.');
+  return d;
+}
+function prepararCidade(d) {
+  const F = d.campos, ix = (n) => F.indexOf(n);
+  const I = { cnpj: ix('cnpj'), fant: ix('fantasia'), raz: ix('razao'), cnae: ix('cnae'), ab: ix('abertura'), lg: ix('logradouro'), num: ix('numero'), comp: ix('complemento'), bai: ix('bairro'), cep: ix('cep'), t1: ix('tel1'), t2: ix('tel2'), em: ix('email') };
+  if (d.cnaes) Object.assign(E.cnaes, d.cnaes);
+  const contagem = {};
+  E.linhas = d.linhas.map((l) => {
+    const cnae = l[I.cnae] || '', raz = l[I.raz] || '', fant = l[I.fant] || '';
+    const bairro = titulo(l[I.bai] || 'Sem bairro');
+    const t1 = l[I.t1] || '', t2 = l[I.t2] || '';
+    const ativ = E.cnaes[cnae] || (cnae ? 'Atividade ' + cnae : 'Atividade não informada');
+    const meses = mesesDesde(l[I.ab]);
+    contagem[bairro] = (contagem[bairro] || 0) + 1;
+    const nome = fant ? titulo(fant) : titulo(raz) || 'MEI sem nome';
+    return {
+      cnpj: l[I.cnpj], nome, dono: raz, temFant: !!fant, cnae, ativ, tipo: tipoDoCnae(cnae), abertura: l[I.ab], meses,
+      end: [titulo(l[I.lg]), l[I.num], titulo(l[I.comp])].filter(Boolean).join(', '), bairro, cep: l[I.cep] || '',
+      t1, t2, cel: celular(t1) || celular(t2), email: l[I.em] || '',
+      busca: semAcento([fant, raz, ativ, l[I.lg], bairro, t1, t2].join(' ')),
+    };
+  });
+  E.bairros = Object.entries(contagem).sort((a, b) => b[1] - a[1]).map(([n, q]) => ({ n, q }));
+  E.filtros.bairros = E.filtros.bairros.filter((b) => contagem[b]);
+}
+
+/* ---------- filtro ---------- */
+function passaFiltros(r, f, ignorarAba) {
+  const t = TEMPOS.find((x) => x.id === f.tempo);
+  if (t && t.m && r.meses < t.m) return false;
+  if (f.tipos.length && !f.tipos.includes(r.tipo)) return false;
+  if (f.bairros.length && !f.bairros.includes(r.bairro)) return false;
+  if (f.tel && !(r.t1 || r.t2)) return false;
+  if (E.busca) { const termos = semAcento(E.busca).split(/\s+/).filter(Boolean); if (!termos.every((x) => r.busca.includes(x))) return false; }
+  return true;
+}
+function listaFiltrada() {
+  const f = E.filtros, base = E.linhas.filter((r) => passaFiltros(r, f));
+  const cont = { novos: 0, contatados: 0, interessados: 0, naoquer: 0, todos: 0 };
+  for (const r of base) {
+    const s = contato(r.cnpj).s; const a = ABAS.find((x) => x.st === s);
+    if (a) cont[a.id]++;
+    if (!(f.esconderNao && s === 'naoquer')) cont.todos++;
+  }
+  const aba = ABAS.find((a) => a.id === E.aba);
+  let lista = base.filter((r) => { const s = contato(r.cnpj).s; return aba.st === null ? !(f.esconderNao && s === 'naoquer') : s === aba.st; });
+  const o = f.ordem;
+  const cmpData = (a, b) => (a.abertura || '99999999').localeCompare(b.abertura || '99999999');
+  if (o === 'antigos') lista.sort(cmpData);
+  else if (o === 'novos') lista.sort((a, b) => cmpData(b, a));
+  else if (o === 'nome') lista.sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
+  else lista.sort((a, b) => a.bairro.localeCompare(b.bairro, 'pt') || cmpData(a, b));
+  return { lista, cont };
+}
+function chipsFiltros() {
+  const f = E.filtros, out = [];
+  if (f.tempo !== 'qualquer') out.push({ txt: 'Aberto há ' + TEMPOS.find((t) => t.id === f.tempo).nome, rm: () => { f.tempo = 'qualquer'; } });
+  f.tipos.forEach((t) => out.push({ txt: t, rm: () => { f.tipos = f.tipos.filter((x) => x !== t); } }));
+  f.bairros.forEach((b) => out.push({ txt: b, rm: () => { f.bairros = f.bairros.filter((x) => x !== b); } }));
+  if (f.tel) out.push({ txt: 'Com telefone', rm: () => { f.tel = false; } });
+  return out;
+}
+
+/* ---------- render: lista ---------- */
+let chipsAtuais = [];
+function renderLista() {
+  const { lista, cont } = listaFiltrada();
+  $('#abas').innerHTML = ABAS.map((a) => `<button role="tab" aria-selected="${a.id === E.aba}" class="aba ${a.id === E.aba ? 'on' : ''}" data-aba="${a.id}">${a.nome} <em>${cont[a.id]}</em></button>`).join('');
+  chipsAtuais = chipsFiltros();
+  $('#chips-ativos').innerHTML = chipsAtuais.map((c, i) => `<button class="chip-at" data-rmchip="${i}" aria-label="Remover filtro ${esc(c.txt)}">${esc(c.txt)} <span aria-hidden="true">×</span></button>`).join('');
+  const b = $('#badge'); b.textContent = chipsAtuais.length; b.classList.toggle('oculto', !chipsAtuais.length);
+
+  const vis = lista.slice(0, E.limite);
+  const ord = ORDENS.find((o) => o.id === E.filtros.ordem).nome;
+  let h = `<div class="info-lista">${lista.length.toLocaleString('pt-BR')} ${lista.length === 1 ? 'empresa' : 'empresas'} · ${ord.toLowerCase()}${largo.matches ? '' : ' · toque para ver tudo'}</div>`;
+  if (!lista.length) {
+    h += `<div class="vazio">Nenhuma empresa aqui com esses filtros.${chipsAtuais.length || E.busca ? '<br><button class="btn" data-acao="limpar" style="margin-top:12px">Limpar filtros e busca</button>' : ''}</div>`;
+  } else {
+    h += '<div class="cards">' + vis.map(cardHTML).join('') + '</div>';
+    h += `<table class="tabela"><thead><tr><th>Empresa</th><th>Atividade</th><th>Bairro</th><th>Aberta há</th><th>Telefone</th><th>Situação</th></tr></thead><tbody>${vis.map(linhaHTML).join('')}</tbody></table>`;
+    if (lista.length > vis.length) h += `<div class="mais-wrap"><button class="btn" data-acao="mais" style="width:100%">Mostrar mais (${(lista.length - vis.length).toLocaleString('pt-BR')} restantes)</button></div>`;
+  }
+  $('#v-lista').innerHTML = h;
+  if (largo.matches) { renderFiltros($('#filtros-lado'), E.filtros, true); if (!E.sel && vis[0]) { E.sel = vis[0].cnpj; } renderDetalhe(); }
+}
+function pillHTML(s) { const st = STATUS.find((x) => x.id === s) || STATUS[0]; return `<span class="pill ${st.cls}">${st.nome}</span>`; }
+function cardHTML(r) {
+  const c = contato(r.cnpj);
+  const tel = r.t1 || r.t2;
+  return `<div class="card ${E.sel === r.cnpj && largo.matches ? 'atual' : ''}">
+    <button class="card-topo" data-abrir="${r.cnpj}">
+      <span class="card-l1"><span class="card-nome">${esc(r.nome)}</span>${pillHTML(c.s)}</span>
+      ${r.temFant ? `<span class="card-dono">${esc(r.dono)}</span>` : ''}
+      <span class="card-ativ">${esc(r.ativ)}</span>
+      <span class="card-meta"><span>${IC.pin()}<b>${esc(r.bairro)}</b></span><span>${IC.cal}${tempoTxt(r.meses)}</span></span>
+    </button>
+    <div class="card-acoes">
+      ${r.cel ? `<a class="btn zap" href="${zapURL(r)}" target="_blank" rel="noopener" data-zap="${r.cnpj}">${IC.zap()}WhatsApp</a>` : `<span class="btn desat" aria-disabled="true">${IC.zap('#14181F')}Sem celular</span>`}
+      ${tel ? `<a class="btn" href="tel:+55${tel}" data-lig="${r.cnpj}">${IC.tel()}Ligar</a>` : `<span class="btn desat" aria-disabled="true">${IC.tel()}Sem telefone</span>`}
+    </div>
+  </div>`;
+}
+function linhaHTML(r) {
+  const c = contato(r.cnpj);
+  return `<tr class="lin ${E.sel === r.cnpj ? 'atual' : ''}" data-abrir="${r.cnpj}" tabindex="0">
+    <td><b>${esc(r.nome)}</b>${r.temFant ? `<small>${esc(r.dono)}</small>` : ''}</td>
+    <td>${esc(r.ativ)}</td><td><b style="font-weight:600">${esc(r.bairro)}</b></td>
+    <td style="white-space:nowrap">${r.meses < 0 ? '—' : tempoTxt(r.meses).replace('Aberto há ', '')}</td>
+    <td style="white-space:nowrap">${esc(fmtTel(r.t1 || r.t2)) || '—'}</td><td>${pillHTML(c.s)}</td></tr>`;
+}
+
+/* ---------- WhatsApp / mapa ---------- */
+function primeiroNome(r) {
+  const n = (r.dono || '').trim().split(/\s+/)[0] || '';
+  return n.length > 1 ? titulo(n) : '';
+}
+function zapURL(r) {
+  const nome = primeiroNome(r);
+  const msg = LS.get('msg', MSG_PADRAO)
+    .replace('{, nome}', nome ? ', ' + nome : '')
+    .replace(/\{nome\}/g, nome)
+    .replace('{, empresa}', r.temFant ? ', ' + r.nome : '')
+    .replace(/\{empresa\}/g, r.temFant ? r.nome : 'seu negócio')
+    .replace(/\{cidade\}/g, titulo(E.cidade.cidade));
+  return `https://wa.me/55${r.cel}?text=${encodeURIComponent(msg)}`;
+}
+function mapaURL(r) {
+  const q = [r.end, r.bairro, titulo(E.cidade.cidade) + ' - ' + E.cidade.uf].filter(Boolean).join(', ');
+  return 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(q);
+}
+function marcarContato(cnpj, oque) {
+  const c = contato(cnpj);
+  salvarContato(cnpj, c.s ? {} : { s: 'contatado' }, oque);
+  setTimeout(atualizar, 300);
+}
+
+/* ---------- render: detalhe ---------- */
+function renderDetalhe() {
+  const el = $('#v-detalhe');
+  const r = E.linhas.find((x) => x.cnpj === E.sel);
+  if (!r) { el.innerHTML = largo.matches ? '<div class="vazio">Escolha uma empresa na lista.</div>' : ''; return; }
+  const c = contato(r.cnpj);
+  const tel = r.t1 || r.t2;
+  const dados = [
+    ['Atividade principal', `${r.ativ}${r.cnae ? ` (CNAE ${r.cnae.slice(0, 4)}-${r.cnae.slice(4, 5)}/${r.cnae.slice(5)})` : ''}`],
+    ['Tipo de negócio', r.tipo],
+    ['Aberta em', r.abertura ? `${dataBR(r.abertura)} · ${tempoTxt(r.meses).replace('Aberto ', '').replace('Aberta ', '')}` : '—'],
+    ['Endereço', [r.end, r.bairro].filter(Boolean).join(' — ') + (r.cep ? ` · CEP ${r.cep.slice(0, 5)}-${r.cep.slice(5)}` : '')],
+    ['Telefone', [fmtTel(r.t1), fmtTel(r.t2)].filter(Boolean).join(' · ') || 'Não informado'],
+    ['E-mail', r.email || 'Não informado'],
+    ['CNPJ', fmtCnpj(r.cnpj)],
+    ['Situação na Receita', 'Ativa · optante pelo MEI'],
+  ];
+  el.innerHTML = `
+    <div class="det-cab">
+      <button class="voltar" data-acao="voltar">${IC.voltar}Voltar</button>
+      <div class="det-tit"><h2>${esc(r.nome)}</h2><span>${esc(r.temFant ? r.dono : '')}${r.temFant ? ' · ' : ''}MEI</span></div>
+      <div class="det-acoes">
+        ${r.cel ? `<a class="btn zap" href="${zapURL(r)}" target="_blank" rel="noopener" data-zap="${r.cnpj}">${IC.zap('#fff', 20)}WhatsApp</a>` : `<span class="btn desat">${IC.zap('#14181F', 20)}Sem celular</span>`}
+        ${tel ? `<a class="btn" href="tel:+55${tel}" data-lig="${r.cnpj}">${IC.tel('#14181F', 20)}Ligar</a>` : `<span class="btn desat">${IC.tel('#14181F', 20)}Sem tel.</span>`}
+        <a class="btn" href="${mapaURL(r)}" target="_blank" rel="noopener">${IC.pin('#14181F', 20)}Mapa</a>
+      </div>
+    </div>
+    <div class="det-corpo">
+      <div class="bloco"><span class="sec">Situação do contato</span>
+        <div class="status-grid" role="radiogroup" aria-label="Situação do contato">
+          ${STATUS.map((s) => `<button role="radio" aria-checked="${c.s === s.id}" class="st ${s.cls} ${c.s === s.id ? 'on' : ''}" data-st="${s.id}">${s.nome}</button>`).join('')}
+        </div></div>
+      <div class="bloco"><span class="sec">Anotação</span>
+        <div class="notas-rap">${NOTAS_RAP.map((n) => `<button data-nota="${esc(n)}">${esc(n)}</button>`).join('')}</div>
+        <label for="nota" class="sr">Anotação</label>
+        <textarea id="nota" rows="2" placeholder="Escreva uma anotação...">${esc(c.n)}</textarea></div>
+      <div class="bloco dados">${dados.map(([k, v]) => `<div class="dado"><small>${k}</small><span>${esc(v)}</span></div>`).join('')}</div>
+      <div class="bloco"><span class="sec">Histórico</span>
+        ${(c.h || []).length ? c.h.slice(0, 15).map(([t, x]) => `<div class="hist"><span>${quando(t)}</span><span>${esc(x)}</span></div>`).join('') : '<span style="font-size:14px;color:var(--cinza2)">Nenhum contato ainda.</span>'}
+      </div>
+    </div>`;
+}
+function quando(t) {
+  const d = new Date(t), h = new Date(), hh = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  const dias = Math.round((new Date(h.toDateString()) - new Date(d.toDateString())) / 864e5);
+  return dias === 0 ? 'Hoje ' + hh : dias === 1 ? 'Ontem ' + hh : d.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' }) + ' ' + hh;
+}
+
+/* ---------- render: filtros ---------- */
+let rascunho = null, buscaBairro = '';
+function renderFiltros(alvo, f, imediato) {
+  const bq = semAcento(buscaBairro);
+  let bairros = E.bairros.filter((b) => !bq || semAcento(b.n).includes(bq));
+  if (!bq) bairros = bairros.slice(0, 14);
+  f.bairros.forEach((b) => { if (!bairros.find((x) => x.n === b)) bairros.unshift({ n: b, q: (E.bairros.find((x) => x.n === b) || {}).q || 0 }); });
+  const corpo = `
+    <div class="grupo"><b>Tempo de empresa</b><div class="chips">${TEMPOS.map((t) => `<button class="chip ${f.tempo === t.id ? 'on' : ''}" aria-pressed="${f.tempo === t.id}" data-f-tempo="${t.id}">${t.nome}</button>`).join('')}</div></div>
+    <div class="grupo"><b>Tipo de negócio</b><div class="chips">${TIPOS.map((t) => `<button class="chip ${f.tipos.includes(t) ? 'on' : ''}" aria-pressed="${f.tipos.includes(t)}" data-f-tipo="${esc(t)}">${t}</button>`).join('')}</div></div>
+    <div class="grupo"><b>Bairro</b>
+      <label class="sr" for="busca-bairro-${imediato ? 'l' : 'f'}">Buscar bairro</label>
+      <input class="campo" style="height:44px;font-size:15px" id="busca-bairro-${imediato ? 'l' : 'f'}" data-f-bbusca placeholder="Buscar bairro" value="${esc(buscaBairro)}" autocomplete="off">
+      <div class="chips">${bairros.map((b) => `<button class="chip ${f.bairros.includes(b.n) ? 'on' : ''}" aria-pressed="${f.bairros.includes(b.n)}" data-f-bairro="${esc(b.n)}">${esc(b.n)} <span style="font-weight:500;opacity:.75">${b.q}</span></button>`).join('') || '<span style="font-size:14px;color:var(--cinza2)">Nenhum bairro encontrado.</span>'}</div></div>
+    <div class="grupo" style="gap:4px">
+      <label class="toggle"><span>Somente com telefone</span><input type="checkbox" data-f-tel ${f.tel ? 'checked' : ''}></label>
+      <label class="toggle"><span>Esconder quem não quer (na aba Todos)</span><input type="checkbox" data-f-nao ${f.esconderNao ? 'checked' : ''}></label>
+    </div>
+    <div class="grupo"><label class="rot" for="ordem-${imediato ? 'l' : 'f'}" style="font-size:14px;font-weight:700;color:var(--tinta)">Ordenar por</label>
+      <select class="campo" style="height:46px;font-size:15px" id="ordem-${imediato ? 'l' : 'f'}" data-f-ordem>${ORDENS.map((o) => `<option value="${o.id}" ${f.ordem === o.id ? 'selected' : ''}>${o.nome}</option>`).join('')}</select></div>`;
+  if (imediato) {
+    const foco = document.activeElement && document.activeElement.matches('[data-f-bbusca]') && alvo.contains(document.activeElement);
+    alvo.innerHTML = `<span style="font-family:var(--tit);font-size:17px;font-weight:700">Filtros</span>${corpo}<button class="btn" data-acao="limpar-filtros" style="height:40px;font-size:14px">Limpar filtros</button>`;
+    if (foco) { const i = alvo.querySelector('[data-f-bbusca]'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+  } else {
+    const foco = document.activeElement && document.activeElement.matches('[data-f-bbusca]');
+    const sc = alvo.querySelector('.folha-corpo')?.scrollTop || 0;
+    alvo.innerHTML = `<div class="folha" role="dialog" aria-modal="true" aria-labelledby="tit-filtros">
+      <div class="puxador"><span></span></div>
+      <div class="folha-cab"><h2 id="tit-filtros">Filtros</h2><button class="ico-btn" style="border:0" data-acao="fechar-folha" aria-label="Fechar">${IC.x}</button></div>
+      <div class="folha-corpo">${corpo}</div>
+      <div class="folha-rod"><button class="btn" data-acao="limpar-rascunho">Limpar</button><button class="btn pri" data-acao="aplicar">Aplicar filtros</button></div></div>`;
+    alvo.querySelector('.folha-corpo').scrollTop = sc;
+    if (foco) { const i = alvo.querySelector('[data-f-bbusca]'); i.focus(); i.setSelectionRange(i.value.length, i.value.length); }
+  }
+}
+function abrirFolha() { rascunho = JSON.parse(JSON.stringify(E.filtros)); buscaBairro = ''; $('#folha').classList.remove('oculto'); renderFiltros($('#folha'), rascunho, false); }
+function fecharFolha() { $('#folha').classList.add('oculto'); $('#folha').innerHTML = ''; rascunho = null; buscaBairro = ''; }
+function mexerFiltro(el, f) {
+  if (el.dataset.fTempo) f.tempo = el.dataset.fTempo;
+  else if (el.dataset.fTipo) { const t = el.dataset.fTipo; f.tipos = f.tipos.includes(t) ? f.tipos.filter((x) => x !== t) : [...f.tipos, t]; }
+  else if (el.dataset.fBairro) { const b = el.dataset.fBairro; f.bairros = f.bairros.includes(b) ? f.bairros.filter((x) => x !== b) : [...f.bairros, b]; }
+  else return false;
+  return true;
+}
+
+/* ---------- configurações ---------- */
+function abrirConfig() {
+  $('#folha').classList.remove('oculto');
+  const qtd = Object.values(E.contatos).filter((c) => c.s || c.n).length;
+  $('#folha').innerHTML = `<div class="folha" role="dialog" aria-modal="true" aria-labelledby="tit-cfg">
+    <div class="puxador"><span></span></div>
+    <div class="folha-cab"><h2 id="tit-cfg">Configurações</h2><button class="ico-btn" style="border:0" data-acao="fechar-folha" aria-label="Fechar">${IC.x}</button></div>
+    <div class="folha-corpo">
+      <div class="grupo"><label for="cfg-msg"><b style="font-size:14px">Mensagem do WhatsApp</b></label>
+        <textarea id="cfg-msg" rows="5">${esc(LS.get('msg', MSG_PADRAO))}</textarea>
+        <span style="font-size:13px;color:var(--cinza2);line-height:1.45">Use {nome} para o primeiro nome do dono, {empresa} para o nome do negócio e {cidade} para a cidade. Com vírgula, como {, nome}, a vírgula some quando o dado não existe.</span>
+        <button class="btn" data-acao="msg-padrao" style="height:40px;font-size:14px">Voltar para a mensagem padrão</button></div>
+      <div class="grupo"><b style="font-size:14px">Passar contatos entre celular e PC</b>
+        <span style="font-size:13px;color:var(--cinza2);line-height:1.45">Você tem ${qtd} ${qtd === 1 ? 'empresa marcada' : 'empresas marcadas'} neste aparelho. Exporte aqui e importe no outro aparelho; as marcações são juntadas, ficando sempre a mais recente.</span>
+        <div class="cfg-lista"><button class="btn" data-acao="exportar">Exportar contatos</button>
+        <label class="btn">Importar contatos<input type="file" id="in-import" accept=".json,application/json" class="sr"></label></div></div>
+      <div class="grupo"><b style="font-size:14px">Dados</b>
+        <span style="font-size:13px;color:var(--cinza2);line-height:1.45">Base da Receita: ${esc(E.cidade?.base || E.indice?.base || '—')}${E.indice?.gerado ? ' · preparada em ' + esc(E.indice.gerado) : ''}.</span>
+        <button class="btn" data-acao="recarregar">Atualizar dados da cidade</button></div>
+    </div></div>`;
+  $('#cfg-msg').addEventListener('input', (e) => LS.set('msg', e.target.value));
+}
+function exportar() {
+  const blob = new Blob([JSON.stringify({ app: 'prospeccao-mei', exportado: new Date().toISOString(), contatos: E.contatos })], { type: 'application/json' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = `contatos-mei-${new Date().toISOString().slice(0, 10)}.json`; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(a.href), 2000);
+}
+async function importar(arq) {
+  try {
+    const d = JSON.parse(await arq.text());
+    if (d.app !== 'prospeccao-mei' || typeof d.contatos !== 'object') throw new Error();
+    let n = 0;
+    for (const [k, v] of Object.entries(d.contatos)) {
+      if (!/^\d{14}$/.test(k) || typeof v !== 'object') continue;
+      const atual = E.contatos[k];
+      const tNovo = (v.h && v.h[0] && v.h[0][0]) || 0, tAtual = (atual && atual.h && atual.h[0] && atual.h[0][0]) || 0;
+      if (!atual || tNovo > tAtual) {
+        const hs = [...(v.h || []), ...((atual && atual.h) || [])].filter((x) => Array.isArray(x) && x.length === 2);
+        const vist = new Set(); const h = hs.sort((a, b) => b[0] - a[0]).filter((x) => { const c = x.join('|'); if (vist.has(c)) return false; vist.add(c); return true; }).slice(0, 40);
+        E.contatos[k] = { s: ['', 'contatado', 'interessado', 'naoquer'].includes(v.s) ? v.s : '', n: String(v.n || ''), h: h.map(([t, x]) => [+t, String(x)]) };
+        n++;
+      }
+    }
+    LS.set('contatos', E.contatos); fecharFolha(); atualizar(); toast(`${n} ${n === 1 ? 'contato atualizado' : 'contatos atualizados'}.`);
+  } catch { toast('Esse arquivo não é um backup de contatos do app.'); }
+}
+
+/* ---------- tela de cidade ---------- */
+function renderCidadeTela() {
+  const ufs = Object.keys(E.indice?.ufs || {}).sort();
+  const av = $('#aviso-dados');
+  if (!ufs.length) {
+    av.innerHTML = 'Ainda não há cidades disponíveis. Rode o <b>preparar_dados.py</b> e publique a pasta do app de novo, ou abra um arquivo de cidade abaixo.';
+    av.classList.remove('oculto');
+  } else if (E.indice.base === 'DEMO') {
+    av.innerHTML = '<b>Modo demonstração:</b> empresas, nomes e telefones são fictícios.';
+    av.classList.remove('oculto');
+  } else av.classList.add('oculto');
+  if (!E.ufSel || !ufs.includes(E.ufSel)) E.ufSel = E.cidade?.uf && ufs.includes(E.cidade.uf) ? E.cidade.uf : ufs[0];
+  $('#sel-uf').innerHTML = ufs.map((u) => `<option value="${u}" ${u === E.ufSel ? 'selected' : ''}>${u}</option>`).join('') || '<option>—</option>';
+  $('#cid-tel').checked = E.filtros.tel;
+  renderSugestoes();
+  const rec = LS.get('recentes', []).filter((r) => E.indice?.ufs?.[r.uf]?.some((c) => c.c === r.c));
+  $('#recentes-wrap').classList.toggle('oculto', !rec.length);
+  $('#recentes').innerHTML = rec.map((r) => `<button class="chip" data-rec="${r.uf}|${r.c}">${esc(titulo(r.n))} – ${r.uf}</button>`).join('');
+  if (E.indice?.base) $('#rodape-cid').innerHTML = `Dados públicos de CNPJ da Receita Federal · base ${esc(E.indice.base)}<br>Seus contatos e anotações ficam só neste aparelho.`;
+}
+function renderSugestoes() {
+  const lista = E.indice?.ufs?.[E.ufSel] || [];
+  const q = semAcento($('#in-cidade').value.trim());
+  const f = lista.filter((c) => !q || semAcento(c.n).includes(q)).sort((a, b) => (q && semAcento(a.n).startsWith(q) ? 0 : 1) - (q && semAcento(b.n).startsWith(q) ? 0 : 1) || b.q - a.q).slice(0, 40);
+  $('#sug').innerHTML = f.map((c) => `<button role="option" aria-selected="${E.cidSel === c.c}" class="${E.cidSel === c.c ? 'sel' : ''}" data-cid="${c.c}"><span>${esc(titulo(c.n))}</span><small>${c.q.toLocaleString('pt-BR')} MEIs</small></button>`).join('')
+    || `<div style="padding:14px;font-size:14px;color:var(--cinza2)">${lista.length ? 'Nenhuma cidade com esse nome.' : 'Sem cidades para este estado.'}</div>`;
+  const c = lista.find((x) => x.c === E.cidSel);
+  const b = $('#btn-ver'); b.disabled = !c; b.textContent = c ? `Ver empresas de ${titulo(c.n)}` : 'Escolha uma cidade';
+}
+async function abrirCidade(uf, cod) {
+  const b = $('#btn-ver'); b.disabled = true; b.textContent = 'Carregando...';
+  try {
+    const d = await carregarCidade(uf, cod);
+    usarCidade(d);
+  } catch (e) { toast(e.message); renderSugestoes(); }
+}
+function usarCidade(d) {
+  E.cidade = { uf: d.uf, codigo: d.codigo, cidade: d.cidade, base: d.base };
+  LS.set('cidade', { uf: d.uf, c: d.codigo });
+  const rec = LS.get('recentes', []).filter((r) => !(r.uf === d.uf && r.c === d.codigo));
+  LS.set('recentes', [{ uf: d.uf, c: d.codigo, n: d.cidade }, ...rec].slice(0, 5));
+  prepararCidade(d);
+  E.sel = null; E.limite = 60; E.aba = 'novos'; E.busca = ''; $('#in-busca').value = '';
+  $('#nome-cidade').textContent = `${titulo(d.cidade)} – ${d.uf}`;
+  mostrar('principal');
+}
+function mostrar(t) {
+  $('#v-cidade').classList.toggle('oculto', t !== 'cidade');
+  $('#app-principal').classList.toggle('oculto', t !== 'principal');
+  document.body.classList.remove('ver-detalhe');
+  if (t === 'cidade') renderCidadeTela(); else atualizar();
+  window.scrollTo(0, 0);
+}
+function atualizar() { if (!$('#app-principal').classList.contains('oculto')) { renderLista(); if (!largo.matches && document.body.classList.contains('ver-detalhe')) renderDetalhe(); } }
+function abrirDetalhe(cnpj) {
+  E.sel = cnpj;
+  if (largo.matches) { renderLista(); return; }
+  renderDetalhe(); document.body.classList.add('ver-detalhe');
+  $('#v-detalhe .det-corpo')?.scrollTo(0, 0);
+  history.pushState({ det: 1 }, '');
+}
+function fecharDetalhe() { document.body.classList.remove('ver-detalhe'); renderLista(); }
+function salvarFiltros() { LS.set('filtros', E.filtros); E.limite = 60; }
+
+let tToast;
+function toast(m) { let t = $('.toast'); if (!t) { t = document.createElement('div'); t.className = 'toast'; t.setAttribute('role', 'status'); document.body.appendChild(t); } t.textContent = m; clearTimeout(tToast); tToast = setTimeout(() => t.remove(), 3200); }
+
+/* ---------- eventos ---------- */
+document.addEventListener('click', (ev) => {
+  const el = ev.target.closest('button, a, [data-abrir]');
+  if (!el) { if (ev.target.id === 'folha') fecharFolha(); return; }
+  const ds = el.dataset;
+  if (ds.cid) { E.cidSel = ds.cid; const c = E.indice.ufs[E.ufSel].find((x) => x.c === ds.cid); $('#in-cidade').value = titulo(c.n); renderSugestoes(); return; }
+  if (ds.rec) { const [uf, c] = ds.rec.split('|'); abrirCidade(uf, c); return; }
+  if (el.id === 'btn-ver') { abrirCidade(E.ufSel, E.cidSel); return; }
+  if (el.id === 'btn-cidade') { E.cidSel = E.cidade?.codigo; E.ufSel = E.cidade?.uf; $('#in-cidade').value = ''; mostrar('cidade'); return; }
+  if (el.id === 'btn-filtros') { abrirFolha(); return; }
+  if (el.id === 'btn-cfg') { abrirConfig(); return; }
+  if (ds.aba) { E.aba = ds.aba; E.limite = 60; renderLista(); $('#v-lista').scrollTo(0, 0); return; }
+  if (ds.rmchip != null) { chipsAtuais[+ds.rmchip]?.rm(); salvarFiltros(); renderLista(); return; }
+  if (ds.abrir) { abrirDetalhe(ds.abrir); return; }
+  if (ds.zap) { marcarContato(ds.zap, 'Mandou mensagem no WhatsApp'); return; }
+  if (ds.lig) { marcarContato(ds.lig, 'Ligou'); return; }
+  if (ds.st != null) {
+    const st = STATUS.find((s) => s.id === ds.st);
+    if (contato(E.sel).s !== ds.st) salvarContato(E.sel, { s: ds.st }, 'Marcou como ' + st.nome.toLowerCase());
+    renderDetalhe(); if (largo.matches) renderLista(); return;
+  }
+  if (ds.nota) {
+    const atual = contato(E.sel).n; const n = atual ? atual + '\n' + ds.nota : ds.nota;
+    salvarContato(E.sel, { n }, ds.nota); renderDetalhe(); return;
+  }
+  // filtros
+  const naFolha = !!el.closest('#folha'); const f = naFolha ? rascunho : E.filtros;
+  if (f && mexerFiltro(el, f)) {
+    if (naFolha) renderFiltros($('#folha'), rascunho, false); else { salvarFiltros(); renderLista(); }
+    return;
+  }
+  switch (ds.acao) {
+    case 'voltar': history.back(); break;
+    case 'mais': E.limite += 100; renderLista(); break;
+    case 'limpar': E.busca = ''; $('#in-busca').value = ''; E.filtros = { ...E.filtros, tempo: 'qualquer', tipos: [], bairros: [], tel: false }; salvarFiltros(); renderLista(); break;
+    case 'limpar-filtros': E.filtros = { ...E.filtros, tempo: 'qualquer', tipos: [], bairros: [], tel: false }; buscaBairro = ''; salvarFiltros(); renderLista(); break;
+    case 'limpar-rascunho': rascunho = { ...rascunho, tempo: 'qualquer', tipos: [], bairros: [], tel: false, esconderNao: true, ordem: 'antigos' }; buscaBairro = ''; renderFiltros($('#folha'), rascunho, false); break;
+    case 'aplicar': E.filtros = rascunho; salvarFiltros(); fecharFolha(); renderLista(); $('#v-lista').scrollTo(0, 0); break;
+    case 'fechar-folha': fecharFolha(); break;
+    case 'msg-padrao': LS.set('msg', MSG_PADRAO); $('#cfg-msg').value = MSG_PADRAO; break;
+    case 'exportar': exportar(); break;
+    case 'recarregar': fecharFolha(); abrirCidade(E.cidade.uf, E.cidade.codigo).then(() => toast('Dados atualizados.')); break;
+  }
+});
+document.addEventListener('input', (ev) => {
+  const el = ev.target;
+  if (el.id === 'in-cidade') { E.cidSel = null; renderSugestoes(); return; }
+  if (el.id === 'in-busca') { clearTimeout(el._t); el._t = setTimeout(() => { E.busca = el.value.trim(); E.limite = 60; renderLista(); }, 150); return; }
+  if (el.id === 'nota') { clearTimeout(el._t); el._t = setTimeout(() => { salvarContato(E.sel, { n: el.value }); }, 300); return; }
+  if (el.matches('[data-f-bbusca]')) { buscaBairro = el.value; const naFolha = !!el.closest('#folha'); renderFiltros(naFolha ? $('#folha') : $('#filtros-lado'), naFolha ? rascunho : E.filtros, !naFolha); }
+});
+document.addEventListener('change', (ev) => {
+  const el = ev.target;
+  if (el.id === 'sel-uf') { E.ufSel = el.value; E.cidSel = null; $('#in-cidade').value = ''; renderSugestoes(); return; }
+  if (el.id === 'cid-tel') { E.filtros.tel = el.checked; salvarFiltros(); return; }
+  if (el.id === 'in-import' && el.files[0]) { importar(el.files[0]); return; }
+  if (el.id === 'in-arquivo' && el.files[0]) { abrirArquivoCidade(el.files[0]); el.value = ''; return; }
+  if (el.id === 'nota') { const n = el.value.trim(); if (n) salvarContato(E.sel, {}, 'Anotou: ' + n.split('\n').pop().slice(0, 60)); renderDetalhe(); return; }
+  const naFolha = !!el.closest('#folha'); const f = naFolha ? rascunho : E.filtros; if (!f) return;
+  if (el.matches('[data-f-tel]')) f.tel = el.checked;
+  else if (el.matches('[data-f-nao]')) f.esconderNao = el.checked;
+  else if (el.matches('[data-f-ordem]')) f.ordem = el.value;
+  else return;
+  if (!naFolha) { salvarFiltros(); renderLista(); }
+});
+document.addEventListener('keydown', (ev) => {
+  if (ev.key === 'Enter' && ev.target.matches('tr[data-abrir]')) abrirDetalhe(ev.target.dataset.abrir);
+  if (ev.key === 'Escape' && !$('#folha').classList.contains('oculto')) fecharFolha();
+});
+window.addEventListener('popstate', () => { if (document.body.classList.contains('ver-detalhe')) fecharDetalhe(); });
+largo.addEventListener('change', () => { document.body.classList.remove('ver-detalhe'); atualizar(); });
+
+async function abrirArquivoCidade(arq) {
+  try {
+    const d = JSON.parse(await arq.text());
+    if (!d.uf || !d.codigo || !Array.isArray(d.linhas) || !Array.isArray(d.campos)) throw new Error();
+    IDB.set(d.uf + '/' + d.codigo, d);
+    E.indice = E.indice || { base: d.base, ufs: {} }; E.indice.ufs = E.indice.ufs || {};
+    const l = E.indice.ufs[d.uf] = E.indice.ufs[d.uf] || [];
+    if (!l.find((c) => c.c === d.codigo)) l.push({ c: d.codigo, n: d.cidade, q: d.linhas.length });
+    LS.set('indice', E.indice);
+    usarCidade(d);
+  } catch { toast('Esse arquivo não é um arquivo de cidade do app.'); }
+}
+
+/* ---------- início ---------- */
+(async function iniciar() {
+  await carregarIndice();
+  const ult = LS.get('cidade', null);
+  if (ult) {
+    try { const d = await carregarCidade(ult.uf, ult.c); usarCidade(d); return; } catch { /* volta para a escolha */ }
+  }
+  mostrar('cidade');
+})();
+
+if ('serviceWorker' in navigator && location.protocol === 'https:' && !/claude\.ai|claudeusercontent/.test(location.hostname)) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+</script>
+</body>
+</html>

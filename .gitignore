@@ -1,0 +1,4 @@
+receita/
+*.zip
+*.parcial
+__pycache__/
