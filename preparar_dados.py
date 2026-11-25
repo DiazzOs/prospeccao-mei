@@ -64,11 +64,29 @@ def _req(caminho, token, metodo="GET", timeout=120, headers=None):
 
 
 def mes_mais_recente(token):
-    xml = _req("", token, "PROPFIND", 60, {"Depth": "1"}).read().decode("utf-8", "replace")
-    meses = sorted(set(re.findall(r"/(\d{4}-\d{2})/?<", xml)))
-    if not meses:
-        raise RuntimeError("não encontrei pastas de mês no compartilhamento da Receita")
-    return meses[-1]
+    corpo = ""
+    try:
+        resp = _req("", token, "PROPFIND", 60, {"Depth": "1"})
+        corpo = resp.read().decode("utf-8", "replace")
+        meses = sorted(set(re.findall(r"(\d{4}-\d{2})/?</d:href>", corpo)))
+        if meses:
+            return meses[-1]
+    except Exception as e:  # noqa: BLE001
+        corpo = f"{type(e).__name__}: {e}"
+    log(f"listagem não funcionou ({corpo[:200]!r}); procurando o mês direto...")
+    # plano B: testa o mês atual e os anteriores
+    hoje = datetime.now()
+    a, m = hoje.year, hoje.month
+    for _ in range(4):
+        mes = f"{a}-{m:02d}"
+        try:
+            r = _req(f"{mes}/Cnaes.zip", token, "HEAD", 60)
+            r.close()
+            return mes
+        except Exception:  # noqa: BLE001
+            pass
+        a, m = (a - 1, 12) if m == 1 else (a, m - 1)
+    raise RuntimeError("não encontrei pastas de mês no compartilhamento da Receita")
 
 
 def baixar(pasta, mes, token):
@@ -186,8 +204,13 @@ def main():
     mes = a.mes
     if not a.sem_baixar:
         try:
-            token = descobrir_token()
-            mes = mes or mes_mais_recente(token)
+            token = TOKEN_PADRAO
+            try:
+                ultimo = mes_mais_recente(token)
+            except Exception:  # noqa: BLE001  (o código do compartilhamento pode ter mudado)
+                token = descobrir_token()
+                ultimo = mes_mais_recente(token)
+            mes = mes or ultimo
             log(f"base da Receita: {mes}")
             baixar(a.pasta, mes, token)
         except Exception as e:  # noqa: BLE001

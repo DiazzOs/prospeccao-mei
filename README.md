@@ -20,6 +20,12 @@ App no celular e no PC → você escolhe o estado e a cidade dentro do app
 
 O script roda no seu PC porque a base da Receita é grande. O app só baixa o arquivo da cidade escolhida.
 
+## Publicado
+
+- **App:** https://diazzos.github.io/prospeccao-mei/
+- **Atualizar os dados todo mês:** dê dois cliques em `atualizar.bat` (na pasta `Documentos\prospeccao-mei` do PC). Quando terminar, envie a pasta `dados_gerados` para `app/dados/` neste repositório; ou peça ao Claude: "publique os dados novos da prospecção". O GitHub publica sozinho a cada envio.
+- A Receita bloqueia downloads vindos de servidores fora do Brasil, por isso o download é feito no PC.
+
 ## 1. Preparar os dados (uma vez por mês)
 
 Você precisa do **Python 3.9 ou mais novo** (em python.org) e de uns **10 GB livres** no disco.

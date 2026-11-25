@@ -1,14 +1,10 @@
-name: Atualizar dados e publicar
+name: Publicar app
 
+# A base da Receita só pode ser baixada de um computador no Brasil (o servidor
+# bloqueia a nuvem do GitHub). Por isso os dados são gerados no PC com o
+# atualizar.bat e enviados para app/dados/; aqui só publicamos.
 on:
   workflow_dispatch:
-    inputs:
-      ufs:
-        description: "Estados (separados por espaço), ex.: MA PI"
-        default: "MA"
-        required: true
-  schedule:
-    - cron: "17 9 12 * *"   # todo dia 12, 06:17 de Brasília (a Receita publica a base do mês na 1ª quinzena)
   push:
     branches: [main]
 
@@ -22,31 +18,15 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 300
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - name: Baixar base da Receita e gerar dados
-        run: python preparar_dados.py --uf ${{ github.event.inputs.ufs || vars.UFS || 'MA' }}
-      - name: Montar site
-        run: |
-          rm -rf receita
-          cp -r app _site
-          du -sh _site
-      - uses: actions/upload-pages-artifact@v3
-        with:
-          path: _site
-
   deploy:
-    needs: build
     runs-on: ubuntu-latest
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - uses: actions/checkout@v4
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app
       - id: deployment
         uses: actions/deploy-pages@v4
